@@ -1,4 +1,4 @@
 #!/bin/bash
 
-ansible-playbook test.yml -i inventory --diff $@
+ansible-playbook -v test.yml -i inventory --diff $@
 
