@@ -1,0 +1,16 @@
+# vim: ft=ansible:et:ts=2
+
+- block:
+    - name: Create external collectors directory
+      file: path="{{ _scollector.external_collectors.dir }}" state=directory owner=root group=root mode=0755
+
+    - name: Create external collectors interval directories
+      file: path="{{ _scollector.external_collectors.dir }}/{{ item.interval }}" state=directory owner=root group=root mode=0755
+      with_items: "{{ _scollector.external_collectors.collectors }}"
+
+    - name: Create external collectors
+      template: src="/etc/ansible/templates/external_collectors/{{ item.template }}" dest="{{ _scollector.external_collectors.dir }}/{{ item.interval }}/{{ item.filename }}" owner=root group=root mode=0750
+      with_items: "{{ _scollector.external_collectors.collectors }}"
+
+  when: _scollector.external_collectors is defined
+

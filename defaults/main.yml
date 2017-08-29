@@ -1,0 +1,33 @@
+# vim: ts=2 sw=2 et ft=ansible
+---
+_scollector:
+  use_default_config: yes
+  server:
+    ip: "127.0.0.1"
+    port: 8070
+    proto: "http"
+  auth:
+    user: "scollector"
+    password: "secret"
+  hostname: "{{ ansible_hostname }}"
+  domain: "example.com"
+  hostgroup: "example_hosts"
+  external_collectors:
+    dir: "/usr/share/external_collectors"
+    template: |+
+      #!/bin/bash
+      function nowAsEpoch() {
+        date +'%s'
+      }
+      function printValue() {
+        local metric=$1
+        shift
+        local value=$1
+        shift
+        local timestamp=$(nowAsEpoch)
+
+        echo $metric $timestamp $value $@
+      }
+    collectors:
+      - { metric: sample.metric, interval: 60, template: sample_metric.sh.j2, filename: sample_metric.sh }
+

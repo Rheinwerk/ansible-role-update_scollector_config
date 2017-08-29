@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  connection: local
+  become: yes
+  become_user: root
+
+  pre_tasks:
+    - file: name="/etc/logrotate.d" state=directory owner="root" group="root" mode="0755"
+    - file: name="/etc/ansible/templates/external_collectors" state=directory owner="root" group="root" mode="0755"
+    - file: name="/etc/ansible/templates/external_collectors/sample_metric.sh.j2" state=touch owner="root" group="root" mode="0640"
+  roles:
+    - ansible-role-update_scollector_config
