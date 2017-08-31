@@ -6,6 +6,7 @@
 
   pre_tasks:
     - file: name="/etc/logrotate.d" state=directory owner="root" group="root" mode="0755"
+    - file: name="/etc/bosun" state=directory owner="root" group="root" mode="0755"
     - file: name="/etc/ansible/templates/external_collectors" state=directory owner="root" group="root" mode="0755"
     - copy: content="Nothing here" dest="/etc/ansible/templates/external_collectors/sample_metric.sh.j2" owner="root" group="root" mode="0644"
   roles:
