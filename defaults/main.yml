@@ -30,5 +30,5 @@ _scollector:
       }
     collectors:
       - { metric: sample.metric, interval: 60, template: sample_metric.sh.j2, filename: sample_metric.sh }
-    metric_metadata:
-      - { metric: sample_metric, ratetype: gauge, unit: "days", desc: "Days until expiration" }
+#    metric_metadata:
+#      - { metric: sample_metric, ratetype: gauge, unit: "days", desc: "Days until expiration" }
