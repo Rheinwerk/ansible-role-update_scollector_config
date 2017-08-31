@@ -14,3 +14,8 @@
 
   when: _scollector.external_collectors is defined
 
+- name: Create scollector configuration file
+  template: src="{{ item }}.j2" dest="/{{ item }}" owner=root group=root mode=0640
+  with_items:
+    - "etc/bosun/scollector.conf"
+
