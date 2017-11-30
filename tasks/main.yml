@@ -31,6 +31,7 @@
       register: result
       failed_when: result.stdout != "204"
       with_items: "{{ _scollector.external_collectors.metric_metadata }}"
+      ignore_errors: yes
 
   when: _scollector.external_collectors.metric_metadata is defined
 
