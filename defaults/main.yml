@@ -12,6 +12,7 @@ _scollector:
   hostname: "{{ ansible_hostname }}"
   domain: "example.com"
   hostgroup: "example_hosts"
+  max_queue_len: 200000
   external_collectors:
     dir: "/usr/share/external_collectors"
     template: |+
