@@ -12,7 +12,7 @@ DisableSelf = false
 [Tags]
   hostgroup = "{{ _scollector.hostgroup }}"
 {% if _scollector.common is defined and _scollector.common.tags is defined %}
-{% for k,v in _scollector.common.tags.iteritems() %}
+{% for k,v in _scollector.common.tags.items() %}
   {{ k }} = "{{ v }}"
 {% endfor %}
 {% endif %}
