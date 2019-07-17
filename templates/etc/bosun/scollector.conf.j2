@@ -9,6 +9,10 @@ ColDir = "{{ _scollector.external_collectors.dir }}"
 {% endif %}
 DisableSelf = false
 
+{% if _scollector.extra_lines is defined %}
+{{ _scollector.extra_lines }}
+{% endif %}
+
 [Tags]
   hostgroup = "{{ _scollector.hostgroup }}"
 {% if _scollector.common is defined and _scollector.common.tags is defined %}
@@ -16,8 +20,3 @@ DisableSelf = false
   {{ k }} = "{{ v }}"
 {% endfor %}
 {% endif %}
-
-{% if _scollector.extra_lines is defined %}
-{{ _scollector.extra_lines }}
-{% endif %}
-
