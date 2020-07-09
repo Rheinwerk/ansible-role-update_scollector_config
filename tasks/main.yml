@@ -39,6 +39,16 @@
   with_items:
     - "etc/bosun/scollector.conf"
 
+- name: Check if init (override) file for scollector exists
+  stat:
+    path: /etc/init/scollector.override
+  register: stat_scollector_override
+  when: _scollector.oom_score is defined
+
+- name: Set oom score for scollector
+  lineinfile: dest="{{ stat_scollector_override.stat.path }}" state=present regexp='^oom score' line="oom score {{ _scollector.oom_score }}"
+  when: _scollector.oom_score is defined and stat_scollector_override.stat.exists
+
 - block:
     - name: Announce Meta data of external collector metrics
       run_once: true
