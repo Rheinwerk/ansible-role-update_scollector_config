@@ -43,11 +43,11 @@
   stat:
     path: /etc/init/scollector.override
   register: stat_scollector_override
-  when: _scollector.oom_score is defined
+  when: _scollector.oom_score_adj is defined
 
 - name: Set oom score for scollector
-  lineinfile: dest="{{ stat_scollector_override.stat.path }}" state=present regexp='^oom score' line="oom score {{ _scollector.oom_score }}"
-  when: _scollector.oom_score is defined and stat_scollector_override.stat.exists
+  lineinfile: dest="{{ stat_scollector_override.stat.path }}" state=present regexp='^oom score' line="oom score {{ _scollector.oom_score_adj }}"
+  when: _scollector.oom_score_adj is defined and stat_scollector_override.stat.exists
 
 - block:
     - name: Announce Meta data of external collector metrics

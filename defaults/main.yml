@@ -2,7 +2,7 @@
 ---
 _scollector:
   use_default_config: yes
-  oom_score: -10
+  oom_score_adj: -10
   server:
     ip: "127.0.0.1"
     port: 8070
