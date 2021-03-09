@@ -72,7 +72,7 @@
 
     - name: Reload service definitions
       systemd:
-        daemon_reexec: yes
+        daemon_reload: yes
       when: systemd_reload.changed
   when: _scollector.oom_score_adj is defined and ansible_service_mgr == "systemd"
 
