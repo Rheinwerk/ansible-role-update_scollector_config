@@ -47,7 +47,7 @@
 
     - name: Creating init (override) file for scollector
       file:
-        path: "/etc/init/scollector.override"
+        path: /etc/init/scollector.override
         state: touch
         owner: root
         group: root
@@ -56,7 +56,7 @@
 
     - name: Set oom score for scollector in Upstart
       lineinfile: 
-        dest: "{{ stat_scollector_override.stat.path }}" 
+        dest: /etc/init/scollector.override
         state: present 
         regexp: '^oom score' 
         line: "oom score {{ _scollector.oom_score_adj }}"
