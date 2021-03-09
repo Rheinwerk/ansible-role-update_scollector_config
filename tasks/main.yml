@@ -45,13 +45,21 @@
         path: /etc/init/scollector.override
       register: stat_scollector_override
 
+    - name: Creating init (override) file for scollector
+      file:
+        path: "/etc/init/scollector.override"
+        state: touch
+        owner: root
+        group: root
+        mode: 0640
+      when: not stat_scollector_override.stat.exists
+
     - name: Set oom score for scollector in Upstart
       lineinfile: 
         dest: "{{ stat_scollector_override.stat.path }}" 
         state: present 
         regexp: '^oom score' 
         line: "oom score {{ _scollector.oom_score_adj }}"
-      when: stat_scollector_override.stat.exists
   when: _scollector.oom_score_adj is defined and ansible_service_mgr == "upstart"
 
 - block:
