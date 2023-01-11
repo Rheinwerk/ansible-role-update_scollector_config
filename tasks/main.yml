@@ -1,6 +1,7 @@
 # vim: ft=ansible:et:ts=2
 
 - name: Configure external_collectors
+  when: _scollector.external_collectors is defined
   block:
     - name: Create external collectors directory
       file:
@@ -28,8 +29,6 @@
         mode: 0750
       with_items: "{{ _scollector.external_collectors.collectors }}"
 
-  when: _scollector.external_collectors is defined
-
 - name: Create scollector configuration file
   template:
     src: "{{ item }}.j2"
@@ -40,31 +39,8 @@
   with_items:
     - "etc/bosun/scollector.conf"
 
-- name: Configure OOM Score Upstart
-  block:
-    - name: Check if init (override) file for scollector exists
-      stat:
-        path: /etc/init/scollector.override
-      register: stat_scollector_override
-
-    - name: Creating init (override) file for scollector
-      file:
-        path: /etc/init/scollector.override
-        state: touch
-        owner: root
-        group: root
-        mode: 0644
-      when: not stat_scollector_override.stat.exists
-
-    - name: Set oom score for scollector in Upstart
-      lineinfile:
-        dest: /etc/init/scollector.override
-        state: present
-        regexp: '^oom score'
-        line: "oom score {{ _scollector.oom_score_adj }}"
-  when: _scollector.oom_score_adj is defined and ansible_service_mgr == "upstart"
-
 - name: Configure OOM Score SystemD
+  when: _scollector.oom_score_adj is defined
   block:
     - name: Check if SystemD Unit file for scollector exists
       stat:
@@ -85,9 +61,9 @@
       systemd:
         daemon_reload: yes
       when: systemd_reload.changed
-  when: _scollector.oom_score_adj is defined and ansible_service_mgr == "systemd"
 
 - name: Announce external_collectors metric_metadata
+  when: _scollector.external_collectors.metric_metadata is defined
   block:
     - name: Announce Meta data of external collector metrics # noqa ignore-errors
       run_once: true
@@ -110,5 +86,3 @@
         status_code: 204
       with_items: "{{ _scollector.external_collectors.metric_metadata }}"
       ignore_errors: yes
-
-  when: _scollector.external_collectors.metric_metadata is defined
