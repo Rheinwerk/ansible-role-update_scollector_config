@@ -1,6 +1,8 @@
 # vim: ft=ansible:et:ts=2
 
-- block:
+- name: Configure external_collectors
+  when: _scollector.external_collectors is defined
+  block:
     - name: Create external collectors directory
       file:
         path: "{{ _scollector.external_collectors.dir }}"
@@ -27,8 +29,6 @@
         mode: 0750
       with_items: "{{ _scollector.external_collectors.collectors }}"
 
-  when: _scollector.external_collectors is defined
-
 - name: Create scollector configuration file
   template:
     src: "{{ item }}.j2"
@@ -39,30 +39,9 @@
   with_items:
     - "etc/bosun/scollector.conf"
 
-- block:
-    - name: Check if init (override) file for scollector exists
-      stat:
-        path: /etc/init/scollector.override
-      register: stat_scollector_override
-
-    - name: Creating init (override) file for scollector
-      file:
-        path: /etc/init/scollector.override
-        state: touch
-        owner: root
-        group: root
-        mode: 0644
-      when: not stat_scollector_override.stat.exists
-
-    - name: Set oom score for scollector in Upstart
-      lineinfile: 
-        dest: /etc/init/scollector.override
-        state: present 
-        regexp: '^oom score' 
-        line: "oom score {{ _scollector.oom_score_adj }}"
-  when: _scollector.oom_score_adj is defined and ansible_service_mgr == "upstart"
-
-- block:
+- name: Configure OOM Score SystemD
+  when: _scollector.oom_score_adj is defined
+  block:
     - name: Check if SystemD Unit file for scollector exists
       stat:
         path: /etc/systemd/system/scollector.service
@@ -82,14 +61,15 @@
       systemd:
         daemon_reload: yes
       when: systemd_reload.changed
-  when: _scollector.oom_score_adj is defined and ansible_service_mgr == "systemd"
 
-- block:
-    - name: Announce Meta data of external collector metrics
+- name: Announce external_collectors metric_metadata
+  when: _scollector.external_collectors.metric_metadata is defined
+  block:
+    - name: Announce Meta data of external collector metrics # noqa ignore-errors
       run_once: true
       uri:
         method: POST
-        url: "{{ _scollector.server.protocol|default('https') }}://{{ _scollector.server.ip }}:{{ _scollector.server.port }}/api/metadata/put"
+        url: "{{ _scollector.server.protocol | default('https') }}://{{ _scollector.server.ip }}:{{ _scollector.server.port }}/api/metadata/put"
         url_username: "{{ _scollector.auth.user }}"
         url_password: "{{ _scollector.auth.password }}"
         body_format: json
@@ -102,9 +82,7 @@
             value: "{{ item.unit }}"
           - metric: "{{ item.metric }}"
             name: "desc"
-            value: "{{ item.desc|default('') }}"
+            value: "{{ item.desc | default('') }}"
         status_code: 204
       with_items: "{{ _scollector.external_collectors.metric_metadata }}"
       ignore_errors: yes
-
-  when: _scollector.external_collectors.metric_metadata is defined
