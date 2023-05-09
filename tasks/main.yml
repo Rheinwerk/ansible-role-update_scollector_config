@@ -4,7 +4,7 @@
   when: _scollector.external_collectors is defined
   block:
     - name: Create external collectors directory
-      file:
+      ansible.builtin.file:
         path: "{{ _scollector.external_collectors.dir }}"
         state: directory
         owner: root
@@ -12,7 +12,7 @@
         mode: 0755
 
     - name: Create external collectors interval directories
-      file:
+      ansible.builtin.file:
         path: "{{ _scollector.external_collectors.dir }}/{{ item.interval }}"
         state: directory
         owner: root
@@ -21,7 +21,7 @@
       with_items: "{{ _scollector.external_collectors.collectors }}"
 
     - name: Create external collectors
-      template:
+      ansible.builtin.template:
         src: "/etc/ansible/templates/external_collectors/{{ item.template }}"
         dest: "{{ _scollector.external_collectors.dir }}/{{ item.interval }}/{{ item.filename }}"
         owner: root
@@ -30,7 +30,7 @@
       with_items: "{{ _scollector.external_collectors.collectors }}"
 
 - name: Create scollector configuration file
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/{{ item }}"
     owner: root
@@ -43,12 +43,12 @@
   when: _scollector.oom_score_adj is defined
   block:
     - name: Check if SystemD Unit file for scollector exists
-      stat:
+      ansible.builtin.stat:
         path: /etc/systemd/system/scollector.service
       register: stat_scollector_systemd
 
     - name: Set oom score for scollector in systemd
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest: "/etc/systemd/system/scollector.service"
         state: present
         regexp: '^OOMScoreAdjust='
@@ -58,7 +58,7 @@
       when: stat_scollector_systemd.stat.exists
 
     - name: Reload service definitions
-      systemd:
+      ansible.builtin.systemd:
         daemon_reload: yes
       when: systemd_reload.changed
 
@@ -67,7 +67,7 @@
   block:
     - name: Announce Meta data of external collector metrics # noqa ignore-errors
       run_once: true
-      uri:
+      ansible.builtin.uri:
         method: POST
         url: "{{ _scollector.server.protocol | default('https') }}://{{ _scollector.server.ip }}:{{ _scollector.server.port }}/api/metadata/put"
         url_username: "{{ _scollector.auth.user }}"
