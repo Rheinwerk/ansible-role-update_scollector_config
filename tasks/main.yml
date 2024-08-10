@@ -1,5 +1,15 @@
 # vim: ft=ansible:et:ts=2
 
+- name: Copy additional external collector templates
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/ansible/templates/external_collectors/"
+    owner: root
+    group: root
+    mode: "0644"
+  with_fileglob:
+    - "files/etc/ansible/templates/external_collectors/*"
+
 - name: Configure external_collectors
   when: _scollector.external_collectors is defined
   block:
