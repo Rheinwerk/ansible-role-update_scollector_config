@@ -19,7 +19,7 @@
         state: directory
         owner: root
         group: root
-        mode: 0755
+        mode: "0755"
 
     - name: Create external collectors interval directories
       ansible.builtin.file:
@@ -27,7 +27,7 @@
         state: directory
         owner: root
         group: root
-        mode: 0755
+        mode: "0755"
       with_items: "{{ _scollector.external_collectors.collectors }}"
 
     - name: Create external collectors
@@ -36,7 +36,7 @@
         dest: "{{ _scollector.external_collectors.dir }}/{{ item.interval }}/{{ item.filename }}"
         owner: root
         group: root
-        mode: 0750
+        mode: "0750"
       with_items: "{{ _scollector.external_collectors.collectors }}"
 
 - name: Create scollector configuration file
@@ -45,7 +45,7 @@
     dest: "/{{ item }}"
     owner: root
     group: root
-    mode: 0640
+    mode: "0640"
   with_items:
     - "etc/bosun/scollector.conf"
 
@@ -66,11 +66,7 @@
         insertafter: '^\[Service\]'
       register: systemd_reload
       when: stat_scollector_systemd.stat.exists
-
-    - name: Reload service definitions
-      ansible.builtin.systemd:
-        daemon_reload: yes
-      when: systemd_reload.changed
+      notify: Reload systemd daemon
 
 - name: Announce external_collectors metric_metadata
   when: _scollector.external_collectors.metric_metadata is defined
