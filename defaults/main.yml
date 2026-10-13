@@ -10,7 +10,7 @@ _scollector:
   auth:
     user: "scollector"
     password: "secret"
-  hostname: "{{ ansible_hostname }}"
+  hostname: "{{ ansible_facts['hostname'] }}"
   domain: "example.com"
   hostgroup: "example_hosts"
   max_queue_len: 200000
