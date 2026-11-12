@@ -21,15 +21,18 @@
         group: root
         mode: "0755"
 
+    # A collector entry can carry credentials, and a loop item ends up in the task result, also
+    # with a label (CDINFRA-1262). So these loops run over the intervals and over indexes.
     - name: Create external collectors interval directories
       ansible.builtin.file:
-        path: "{{ _scollector.external_collectors.dir }}/{{ item.interval }}"
+        path: "{{ _scollector.external_collectors.dir }}/{{ item }}"
         state: directory
         owner: root
         group: root
         mode: "0755"
-      with_items: "{{ _scollector.external_collectors.collectors }}"
+      loop: "{{ _scollector.external_collectors.collectors | map(attribute='interval') | unique | list }}"
 
+    # The collector templates read the entry as item, so the task sets item from the index
     - name: Create external collectors
       ansible.builtin.template:
         src: "/etc/ansible/templates/external_collectors/{{ item.template }}"
@@ -37,7 +40,12 @@
         owner: root
         group: root
         mode: "0750"
-      with_items: "{{ _scollector.external_collectors.collectors }}"
+      vars:
+        item: "{{ _scollector.external_collectors.collectors[_update_scollector_config_index] }}"
+      loop: "{{ range(_scollector.external_collectors.collectors | length) | list }}"
+      loop_control:
+        loop_var: _update_scollector_config_index
+        label: "{{ item.filename }}"
 
 - name: Create scollector configuration file
   ansible.builtin.template:
